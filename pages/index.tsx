@@ -9,26 +9,29 @@ import { useState } from "react";
 const Home: NextPage = (props: Partial<DropzoneProps>) => {
   const theme = useMantineTheme();
   const [type, setType] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onDrop = async (files: File[]) => {
+    setLoading(true);
     console.log("accepted files", files);
     const answers = [];
     for (var i = 0; i < files.length; i++) {
       const data = new FormData();
       data.append("file", files[i]);
-      const answer = await fetch("http://172.16.18.124:2898/upload", {
+      const answer = await fetch("http://127.0.0.1:2898/upload", {
         method: "POST",
         body: data,
       });
       const ans = await answer.text();
       console.log(ans);
-      answers.push(ans)
+      answers.push(ans);
     }
     if (answers.length > 1) {
       setType(answers.join(", "));
     } else {
       setType(answers[0]);
     }
+    setLoading(false);
   };
 
   return (
@@ -46,6 +49,7 @@ const Home: NextPage = (props: Partial<DropzoneProps>) => {
           onReject={(files) => console.log("rejected files", files)}
           maxSize={3 * 1024 ** 2}
           accept={IMAGE_MIME_TYPE}
+          loading={loading}
           {...props}
         >
           <Group
@@ -85,7 +89,11 @@ const Home: NextPage = (props: Partial<DropzoneProps>) => {
             </div>
           </Group>
         </Dropzone>
-        {type && <h3>Type: {type}</h3>}
+        {type && <h3>Тип: {type}</h3>}
+        <div className={styles.footer}>
+          <img src="/drivehack.png" width="256px" height="48px" />
+          <img src="/mos.png" width="90px" height="90px" />
+        </div>
       </main>
     </div>
   );
