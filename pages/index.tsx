@@ -12,16 +12,23 @@ const Home: NextPage = (props: Partial<DropzoneProps>) => {
 
   const onDrop = async (files: File[]) => {
     console.log("accepted files", files);
-    const data = new FormData();
-    data.append("file", files[0]);
-    await fetch("http://172.16.18.124:2898/upload", {
-      method: "POST",
-      body: data,
-    }).then(async (answer) => {
+    const answers = [];
+    for (var i = 0; i < files.length; i++) {
+      const data = new FormData();
+      data.append("file", files[i]);
+      const answer = await fetch("http://172.16.18.124:2898/upload", {
+        method: "POST",
+        body: data,
+      });
       const ans = await answer.text();
       console.log(ans);
-      setType(ans);
-    });
+      answers.push(ans)
+    }
+    if (answers.length > 1) {
+      setType(answers.join(", "));
+    } else {
+      setType(answers[0]);
+    }
   };
 
   return (
